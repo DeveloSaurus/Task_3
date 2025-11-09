@@ -30,6 +30,14 @@ export default function AllPerks() {
 
 */
 
+  useEffect(() => {
+    loadAllPerks();
+  }, [])
+
+
+  useEffect(() => {
+    loadAllPerks();
+  }, [merchantFilter])
   
   useEffect(() => {
     // Extract all merchant names from perks array
@@ -47,7 +55,6 @@ export default function AllPerks() {
     // This effect depends on [perks], so it re-runs whenever perks changes
   }, [perks]) // Dependency: re-run when perks array changes
 
-  
   async function loadAllPerks() {
     // Reset error state before new request
     setError('')
@@ -60,9 +67,9 @@ export default function AllPerks() {
       const res = await api.get('/perks/all', {
         params: {
           // Only include search param if searchQuery is not empty
-          search: searchQuery.trim() || undefined,
+          search: searchQuery || undefined,
           // Only include merchant param if merchantFilter is not empty
-          merchant: merchantFilter.trim() || undefined
+          merchant: merchantFilter || undefined
         }
       })
       
@@ -87,6 +94,9 @@ export default function AllPerks() {
   function handleSearch(e) {
     // Prevent default form submission behavior (page reload)
     e.preventDefault()
+
+    setSearchQuery(e.target.value)
+    setMerchantFilter(e.target.value)
     
     // Immediately reload perks with current search and filter values
     // This bypasses the debounce delay for instant results
@@ -136,6 +146,7 @@ export default function AllPerks() {
                 type="text"
                 className="input"
                 placeholder="Enter perk name..."
+                onChange={handleSearch}
                 
               />
               <p className="text-xs text-zinc-500 mt-1">
@@ -151,7 +162,7 @@ export default function AllPerks() {
               </label>
               <select
                 className="input"
-                
+                onChange={(e) => setMerchantFilter(e.target.value)}
               >
                 <option value="">All Merchants</option>
                 
